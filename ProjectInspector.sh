@@ -2,24 +2,16 @@
 
 PATTERNS_FILE="patterns.txt"
 
-# 1. Read file extensions
 mapfile -t patterns < "patterns.txt"
 
-# 2. Build the find arguments dynamically
 find_args=()
 for pattern in "${patterns[@]}"; do
     # Add -name option followed by the pattern
     find_args+=(-name "$pattern" -o)
 done
 
-# 3. Remove the trailing '-o' operator
-# The command must end with a valid condition
 unset 'find_args[${#find_args[@]}-1]'
 
-# 4. Execute the find command and count the results
-# The command is built using an array to handle spaces correctly
-# -type f ensures only files are counted, not directories
-# -print0 and xargs -0 handle filenames with special characters (e.g., spaces, newlines)
 count=$(find . -type f \( "${find_args[@]}" \) -print0 | xargs -0 echo | wc -w)
 
 echo "Total number of files matching patterns in ${PATTERNS_FILE}: ${count}"
